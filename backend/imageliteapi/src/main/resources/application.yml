@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: imageliteapi
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/imageslite_db?createDatabaseIfNotExist=true
+    username: root
+    password: pw_arcx_123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+server:
+  error:
+    include-message: always
