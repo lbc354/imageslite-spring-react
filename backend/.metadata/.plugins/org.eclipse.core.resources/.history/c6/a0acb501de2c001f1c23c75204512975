@@ -1,0 +1,5 @@
+package com.fullstack.imageliteapi.infra.repositories.specs;
+
+public class ImageSpecs {
+
+}

@@ -14,9 +14,17 @@ public enum ImageExtension {
 		this.mediaType = mediaType;
 	}
 
-	public static ImageExtension valueOf(MediaType mediaType) {
+	public MediaType getMediaType() {
+		return mediaType;
+	}
+
+	public static ImageExtension valorDe(MediaType mediaType) {
 		return Arrays.stream(values()).filter(imageExtension -> imageExtension.mediaType.equals(mediaType)).findFirst()
 				.orElse(null);
+	}
+
+	public static ImageExtension valorDeNome(String name) {
+		return Arrays.stream(values()).filter(ie -> ie.name().equalsIgnoreCase(name)).findFirst().orElse(null);
 	}
 
 }

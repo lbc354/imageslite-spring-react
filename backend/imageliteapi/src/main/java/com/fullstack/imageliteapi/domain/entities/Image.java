@@ -23,6 +23,7 @@ import jakarta.persistence.Table;
 @EntityListeners(AuditingEntityListener.class)
 public class Image {
 
+//	ATRIBUTOS
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
@@ -48,9 +49,10 @@ public class Image {
 	@Lob // indica que o campo é um arquivo, uma stream de dados
 	private byte[] file;
 
+//	CONSTRUTORES
 	public Image() {
 	}
-	
+
 	public Image(String name, Long size, ImageExtension extension, String tags, byte[] file) {
 		this.name = name;
 		this.size = size;
@@ -79,6 +81,7 @@ public class Image {
 		this.file = file;
 	}
 
+//	GETTERS AND SETTERS
 	public String getId() {
 		return id;
 	}
@@ -133,6 +136,11 @@ public class Image {
 
 	public void setFile(byte[] file) {
 		this.file = file;
+	}
+
+//	MÉTODOS
+	public String nomeDoArquivo() {
+		return getName().concat(".").concat(getExtension().name());
 	}
 
 }

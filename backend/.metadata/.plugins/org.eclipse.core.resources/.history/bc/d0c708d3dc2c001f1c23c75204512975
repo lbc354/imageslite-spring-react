@@ -1,0 +1,55 @@
+package com.fullstack.imageliteapi.infra.repositories;
+
+import java.util.List;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.util.StringUtils;
+
+import com.fullstack.imageliteapi.domain.entities.Image;
+import com.fullstack.imageliteapi.domain.enums.ImageExtension;
+
+//specification é uma forma de criar critérios de pesquisa orientado a objeto sem precisar escrever sql
+public interface ImageRepository extends JpaRepository<Image, String>, JpaSpecificationExecutor<Image> {
+
+//	SELECT * FROM IMAGE WHERE 1 = 1 AND EXTENSION = 'PNG' AND ( NAME LIKE 'QUERY' OR TAGS LIKE 'QUERY' )
+	default List<Image> findByExtensionAndNameOrTagsLike(ImageExtension extension, String query) {
+//		SELECT * FROM IMAGE WHERE 1 = 1
+//		q de query
+		Specification<Image> conjunction = (root, q, criteriaBuilder) -> criteriaBuilder.conjunction();
+//		root são os dados da entidade que estamos pesquisando, no caso, a imagem
+//		query é a query sendo montada no momento (SELECT * FROM IMAGE)
+//		criteriaBuilder é o objeto em que consigo construir os critérios (WHERE 1 = 1 AND EXTENSION = 'PNG' AND ...)
+		Specification<Image> spec = Specification.where(conjunction);
+
+//		aqui está a necessidade do specification
+//		assim, conseguimos criar querys dinâmicas baseado na condição de ter um parâmetro ou não
+		if (extension != null) {
+//			o nome "extension temos que olhar para o nome do campo na entidade e não no banco
+			Specification<Image> extensionEqual = (root, q, cb) -> cb.equal(root.get("extension"), extension);
+			spec = spec.and(extensionEqual);
+		}
+
+//		usamos hasText ao invés de comparar com nulo porque, caso o usuário digite um espaço,
+//		espaço é diferente de nulo e isso faria com que buscássemos por espaços no banco
+//		com hasText esperamos um valor de fato ser inserido
+		if (StringUtils.hasText(query)) {
+			Specification<Image> nameLike = (root, q, cb) -> cb.like(cb.upper(root.get("name")),
+					"%" + query.toUpperCase() + "%");
+//			colocando em caixa alta, independe de como o usuário digitar (caixa alta, caixa baixa, camel case, etc),
+//			vamos transformar tudo em caixa alta e comparar
+//		    e os % antes e depois é para procurar por qualquer string que contenha o valor da query (igual no sql mesmo)
+			Specification<Image> tagsLike = (root, q, cb) -> cb.like(cb.upper(root.get("tags")),
+					"%" + query.toUpperCase() + "%");
+
+//			essa é a parte do AND ( NAME LIKE 'QUERY' OR TAGS LIKE 'QUERY' )
+			Specification<Image> nameOrTagsLike = Specification.anyOf(nameLike, tagsLike);
+
+			spec = spec.and(nameOrTagsLike);
+		}
+
+		return findAll(spec);
+	}
+
+}

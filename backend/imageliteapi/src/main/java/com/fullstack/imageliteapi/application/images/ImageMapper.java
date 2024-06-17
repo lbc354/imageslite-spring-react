@@ -14,8 +14,13 @@ import com.fullstack.imageliteapi.domain.enums.ImageExtension;
 public class ImageMapper {
 
 	public Image mapToImage(MultipartFile file, String name, List<String> tags) throws IOException {
-		return new Image(name, file.getSize(), ImageExtension.valueOf(MediaType.valueOf(file.getContentType())),
+		return new Image(name, file.getSize(), ImageExtension.valorDe(MediaType.valueOf(file.getContentType())),
 				String.join(",", tags), file.getBytes());
+	}
+
+	public ImageDto imageToDto(Image image, String url) {
+		return new ImageDto(url, image.getName(), image.getExtension().name(), image.getSize(),
+				image.getUploadDate().toLocalDate());
 	}
 
 }

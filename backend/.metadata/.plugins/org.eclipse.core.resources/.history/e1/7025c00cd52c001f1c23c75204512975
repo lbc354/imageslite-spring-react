@@ -1,0 +1,13 @@
+package com.fullstack.imageliteapi.domain.services;
+
+import java.util.Optional;
+
+import com.fullstack.imageliteapi.domain.entities.Image;
+
+public interface ImageService {
+
+	Image salvar(Image img);
+
+	Optional<Image> buscarUma(String id);
+
+}
